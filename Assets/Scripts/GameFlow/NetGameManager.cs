@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
@@ -39,30 +38,21 @@ public class NetGameManager : NetworkBehaviour
     {
         bIdentity = player;
         TryWireChainServer();
-
         // 给 B 角色添加 HideFromAVisibility 组件
         var vis = player.GetComponent<HideFromAVisibility>();
         if (vis == null) vis = player.gameObject.AddComponent<HideFromAVisibility>();
         vis.Initialize(this);
     }
 
+    // 获取拴链状态
+    public bool IsLeashActive() => leashActive;
 
-    [Command]
-    public void CmdSetLeashActive(bool active)
+    // 设置拴链状态（由 A 调用）
+    public void SetLeashActive(bool active)
     {
-        // 检查是否为 A 角色请求（确保 A 角色有权限调用此命令）
-        if (aIdentity == null || connectionToClient != aIdentity.connectionToClient)
-        {
-            Debug.LogWarning("Only A player can change the leash state.");
-            return;  // 只有 A 角色才有权限调用
-        }
-
         leashActive = active;
         ApplyLeashServerSide();
     }
-
-    // 获取拴链状态
-    public bool IsLeashActive() => leashActive;
 
     // 注册 A/B 角色，并根据拴链状态显示链条
     [Server]
@@ -84,7 +74,6 @@ public class NetGameManager : NetworkBehaviour
     // 拴链状态变化时（SyncVar hook）
     private void OnLeashStateChanged(bool oldVal, bool newVal)
     {
-        // 客户端可以根据状态更新 UI，实际的可见性和约束由服务端处理
         if (bIdentity != null)
         {
             var hideScript = bIdentity.GetComponent<HideFromAVisibility>();

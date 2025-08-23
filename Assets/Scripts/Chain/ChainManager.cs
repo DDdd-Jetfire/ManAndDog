@@ -16,6 +16,9 @@ public class ChainManager : NetworkBehaviour
     // 服务器维护的环列表（只在服务器赋值/使用）
     private readonly List<GameObject> rings = new();
 
+    // 添加一个最大距离，用来限制B与A之间的最大距离
+    public float maxDistanceFromA = 5f; // 这里设置一个示例值，你可以根据需要调整
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -107,12 +110,30 @@ public class ChainManager : NetworkBehaviour
     }
 
     // —— 服务器每帧驱动位置跟随（也可用定时器/阈值减少频率） —— 
+
+    // 更新方法，限制B的移动范围
     private void Update()
     {
-        if (!isServer) return;
+        if (!isServer) return;  // 只有服务器执行
         if (aPlayer == null || bPlayer == null) return;
 
-        // 如果 A/B 在动，这里每帧更新环位置（成本取决于环数量）
+        // 获取A和B之间的距离
+        float distance = Vector2.Distance(aPlayer.transform.position, bPlayer.transform.position);
+
+        // 如果B距离A太远，限制B的位置
+        if (distance > maxDistanceFromA)
+        {
+            // 计算从A到B的方向
+            Vector2 direction = (bPlayer.transform.position - aPlayer.transform.position).normalized;
+
+            // 计算B的新位置，确保B不会超过最大距离
+            Vector2 newPosition = (Vector2)aPlayer.transform.position + direction * maxDistanceFromA;
+
+            // 移动B到新的位置
+            bPlayer.transform.position = newPosition;
+        }
+
+        // 更新链条环的位置，确保环跟随A和B的移动（这一部分保持不变）
         RepositionRingsServer(aPlayer.transform.position, bPlayer.transform.position);
     }
 }

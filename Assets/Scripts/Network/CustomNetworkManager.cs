@@ -20,9 +20,12 @@ public class CustomNetworkManager : NetworkManager
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         Debug.Log($"[NM] OnServerAddPlayer for conn {conn.connectionId}");
-        // ²»µ÷ÓÃ base
+
         var chosen = (numPlayers == 0) ? playerPrefabA : playerPrefabB;
         var player = Instantiate(chosen);
+
+        NetworkServer.Spawn(player);
+
         NetworkServer.AddPlayerForConnection(conn, player);
     }
 }

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3687174581180537654}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: wallChecker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,7 +49,7 @@ GameObject:
   - component: {fileID: -5682178524775571492}
   - component: {fileID: 3567702460138249233}
   - component: {fileID: -3089965568954282359}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Human
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,9 +111,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: 846322965
+  m_SortingLayer: 1
+  m_SortingOrder: 10
   m_Sprite: {fileID: -1648934749, guid: 2e860dd1b992bdd4b996a4d4ab1565ff, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -142,7 +142,7 @@ MonoBehaviour:
   syncInterval: 0
   moveSpeed: 5
   jumpForce: 13.5
-  isPlayerA: 0
+  isPlayerA: 1
   preface: 0
   isGrounded: 0
   isTouchingWall: 0
@@ -343,7 +343,7 @@ MonoBehaviour:
   syncDirection: 1
   syncMode: 0
   syncInterval: 0
-  clientAuthority: 0
+  clientAuthority: 1
   animator: {fileID: 7102693184170394315}
 --- !u!1 &8823803601967955147
 GameObject:
@@ -354,7 +354,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4285648481352341885}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: groundChecker
   m_TagString: Untagged
   m_Icon: {fileID: 0}

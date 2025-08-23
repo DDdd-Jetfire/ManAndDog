@@ -11,11 +11,15 @@ public class DogController : PlayerController
 
     private bool jumpRequest;
 
-    //void Awake()
-    //{
+    public float detectionRadius = 5f;  // 检测半径
+    public LayerMask sightLayer;        // 敌人所在的Layer
+
+
+                                        //void Awake()
+                                        //{
 
     //}
-    
+
     // 这里是用来在本地玩家对象初始化完成时调用
     public override void OnStartLocalPlayer()
     {
@@ -35,7 +39,7 @@ public class DogController : PlayerController
     }
     void Update()
     {
-
+        if (!isLocalPlayer) return;
 
         MoveChecker();
 
@@ -51,6 +55,10 @@ public class DogController : PlayerController
         {
             jumpRequest = true;
         }
+
+        // 调用检测功能
+        enemyInControl = DetectEnemiesInRange();
+
 
 
         // 当 B 玩家按下 E 键时，开始控制敌人
@@ -126,4 +134,23 @@ public class DogController : PlayerController
     }
 
 
+    // 检测范围内的敌人
+    EnemyVisibilityController DetectEnemiesInRange()
+    {
+        // 使用OverlapCircle方法检测范围内的敌人
+        Collider2D[] c = Physics2D.OverlapCircleAll(transform.position, detectionRadius, sightLayer);
+        foreach(var c1 in c)
+        {
+            var x = c1.GetComponent<EnemyVisibilityController>();
+            if (x != null) return x;
+        }
+        return null;
+    }
+
+    // 画出检测的范围（调试用）
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
 }

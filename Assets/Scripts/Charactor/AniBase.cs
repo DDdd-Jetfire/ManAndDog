@@ -108,7 +108,6 @@ public class AniBase : MonoBehaviour
         //Debug.Log("playOneTime");
         if (aniNameIndex.ContainsKey(actionName))
         {
-            Debug.Log("playOneTime");
             ani.Play(aniNameIndex[actionName]);
             currentAniName = actionName;
         }
@@ -129,7 +128,7 @@ public class AniBase : MonoBehaviour
     protected void OnStateEnd()
     {
         //Debug.Log("end");
-                Debug.Log("break");
+                //Debug.Log("break");
 
         inPlayOneShoot = false;
     }
