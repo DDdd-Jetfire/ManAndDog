@@ -11,8 +11,9 @@ public class LocalGameManager : MonoBehaviour
 
     public bool isAPlayer = false;
 
-    public GameObject aTileMap;
+    //public GameObject aTileMap;
     public GameObject bTileMap;
+    public GameObject blackBoard;
 
     private void Awake()
     {
@@ -37,11 +38,13 @@ public class LocalGameManager : MonoBehaviour
         isAPlayer = isA;
         if (isAPlayer)
         {
-            bTileMap.SetActive(false);
+            //bTileMap.SetActive(false);
+            blackBoard.SetActive(true);
         }
         else
         {
-            aTileMap.SetActive(false);
+            blackBoard.SetActive(false);
+            //aTileMap.SetActive(false);
         }
     }
 }

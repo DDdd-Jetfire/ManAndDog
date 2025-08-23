@@ -8,13 +8,14 @@ public class DogController : PlayerController
 
     public EnemyVisibilityController enemyInControl;
 
+    public EnemyManager enemyManager; // 物体管理器
 
     private bool jumpRequest;
 
     public float detectionRadius = 5f;  // 检测半径
     public LayerMask sightLayer;        // 敌人所在的Layer
 
-
+    public bool biteFlag = false;
                                         //void Awake()
                                         //{
 
@@ -24,6 +25,7 @@ public class DogController : PlayerController
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
+        enemyManager = EnemyManager.Instance;
         LocalGameManager.instance.InitSystem(false);
         if (isLocalPlayer)
             NetGameManager.Instance.CmdRegisterB(GetComponent<NetworkIdentity>());
@@ -62,20 +64,29 @@ public class DogController : PlayerController
 
 
         // 当 B 玩家按下 E 键时，开始控制敌人
-        if (Input.GetKeyDown(KeyCode.E))
+
+        if (Input.GetKey(KeyCode.E) && enemyInControl != null)
         {
-            if (enemyInControl != null)
+            
             {
-                enemyInControl.CmdStartControlByB();  // B 开始控制
+                gameObject.transform.position = enemyInControl.gameObject.transform.position;
+                Debug.Log("mark");
+                biteFlag = true;
+                enemyInControl.CmdUpdateBit(true);
             }
         }
+        else
+        {
+            biteFlag = false;
+        }
+
 
         // 当 B 玩家松开 E 键时，停止控制敌人
         if (Input.GetKeyUp(KeyCode.E))
         {
             if (enemyInControl != null)
             {
-                enemyInControl.CmdStopControlByB();  // B 停止控制
+                enemyInControl.StopBit();
             }
         }
 
@@ -95,26 +106,38 @@ public class DogController : PlayerController
             gameObject.transform.localEulerAngles = new Vector3(0, preface < 0 ? 180 : 0, 0);//更改朝向
         }
 
-        if (isGrounded)
+        if (biteFlag)
         {
-            if (move != 0)
-            {
-                ani.TransAction("walk");
-            }
-            else
-            {
-                ani.TransAction("idle");
-            }
+            ani.TransAction("bite");
         }
         else
         {
-            ani.TransAction("jump");
-        }
 
+            if (isGrounded)
+            {
+                if (move != 0)
+                {
+                    ani.TransAction("walk");
+                }
+                else
+                {
+                    ani.TransAction("idle");
+                }
+            }
+            else
+            {
+                ani.TransAction("jump");
+            }
+
+        }
     }
 
     void FixedUpdate()
     {
+        if (biteFlag)
+        {
+            rb.velocity = new Vector2(0, 0);
+        }
         if (isTouchingWall)
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
@@ -133,6 +156,26 @@ public class DogController : PlayerController
         }
     }
 
+
+
+
+
+    // RPC 方法：更新敌人显示给 A 端
+    [ClientRpc]
+    void RpcUpdateEnemyVisibility(bool visible)
+    {
+        if (isServer) return;  // 只有客户端执行
+
+        // 通过管理器设置 A 端显示该敌人
+        if (enemyManager != null)
+        {
+            GameObject enemy = enemyManager.GetMarkedEnemy();
+            if (enemy != null)
+            {
+                enemyManager.SetEnemyVisibility(connectionToClient, visible);
+            }
+        }
+    }
 
     // 检测范围内的敌人
     EnemyVisibilityController DetectEnemiesInRange()

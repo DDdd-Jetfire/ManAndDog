@@ -7,18 +7,26 @@ public class EnemyVisibilityController : NetworkBehaviour
     [SerializeField] Renderer[] renderersToToggle;
     //[SerializeField] Collider2D[] collidersToToggle;
 
+    public AniBase ani;
+
+    [SyncVar]public bool bitFlag = false;
+
+    public HumanController hc;
+    [SyncVar] public Vector2? hitPos;
+
     void Awake()
     {
         // 兜底收集
         if (renderersToToggle == null || renderersToToggle.Length == 0)
             renderersToToggle = GetComponentsInChildren<Renderer>(true);
+        ani = gameObject.GetComponent<AniBase>();
        // if (collidersToToggle == null || collidersToToggle.Length == 0)
        //     collidersToToggle = GetComponentsInChildren<Collider2D>(true);
     }
 
     private void OnEnable()
     {
-        LocalSetVisible(false); // 本地立即隐藏
+        //LocalSetVisible(false); // 本地立即隐藏
     }
 
     // —— 关键 1：客户端一生成就先隐藏，避免“首帧闪现” —— //
@@ -32,7 +40,7 @@ public class EnemyVisibilityController : NetworkBehaviour
     {
         base.OnStartServer();
         // 等待玩家 ready（可能敌人先于玩家 spawn）
-        StartCoroutine(InitVisibilityForAB());
+        //StartCoroutine(InitVisibilityForAB());
     }
     IEnumerator InitVisibilityForAB()
     {
@@ -55,19 +63,82 @@ public class EnemyVisibilityController : NetworkBehaviour
     }
 
 
-    // —— B 开始/停止操控：让 A 临时看到 / 再次隐藏 —— //
-    [Command]
-    public void CmdStartControlByB()
+    public void GetBit()
     {
-        var connA = FindAConnection();
-        if (connA != null) TargetSetVisible(connA, true);
+        CmdUpdateBit(true);
     }
 
-    [Command]
-    public void CmdStopControlByB()
+    // Command: 客户端调用，服务器执行
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateBit(bool flag)
     {
-        var connA = FindAConnection();
-        if (connA != null) TargetSetVisible(connA, false);
+        bitFlag = flag;
+
+        // 使用 Rpc 将值同步到所有客户端
+        //RpcUpdatebit(flag);
+    }
+
+
+    // ClientRpc: 服务器调用，所有客户端执行
+    [ClientRpc]
+    void RpcUpdatebit(bool flag)
+    {
+        // 客户端更新
+        bitFlag = flag;
+    }
+
+    public void StopBit()
+    {
+        //CmdUpdateBit(false);
+    }
+
+    void Update()
+    {
+        if (hitPos != null)
+        {
+            ani.PlayOneShoot("die");
+        }
+        if (hc == null)
+        {
+            hc = FindObjectOfType<HumanController>();
+        }
+        else
+        {
+            if (bitFlag)
+            {
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "ShowEnemy";
+            }
+            else
+            {
+
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "UnShowEnemy";
+            }
+
+            if (bitFlag)hc.evc = this;
+        }
+
+        if (bitFlag)
+        {
+            ani.TransAction("bit");
+        }
+        else
+        {
+            ani.TransAction("idle");
+        }
+    }
+
+
+    // Command: 客户端调用，服务器执行
+    [Command(requiresAuthority = false)]
+    public void KillEnemy(Vector2 dir)
+    {
+        hitPos = dir;
+    }
+
+
+    public void Die()
+    {
+        gameObject.SetActive(false);
     }
 
     // ===== 可复用的查找逻辑 =====
@@ -82,17 +153,6 @@ public class EnemyVisibilityController : NetworkBehaviour
             if (pc.isPlayerA) a = conn; else b = conn;
         }
         return (a, b);
-    }
-
-    NetworkConnectionToClient FindAConnection()
-    {
-        foreach (var conn in NetworkServer.connections.Values)
-        {
-            if (conn == null || !conn.isReady || conn.identity == null) continue;
-            var pc = conn.identity.GetComponent<PlayerController>();
-            if (pc != null && pc.isPlayerA) return conn;
-        }
-        return null;
     }
 
     // ===== 本地立即生效的显示/隐藏（用于防闪帧） =====

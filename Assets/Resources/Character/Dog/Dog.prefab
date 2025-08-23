@@ -126,6 +126,7 @@ MonoBehaviour:
   wallCheckDistance: 0.3
   verticalOffset: 0.5
   enemyInControl: {fileID: 0}
+  enemyManager: {fileID: 0}
   detectionRadius: 5
   sightLayer:
     serializedVersion: 2
@@ -150,6 +151,12 @@ MonoBehaviour:
     priority: 0
   - aniName: walk
     aniClip: {fileID: 7400000, guid: bd68158b9bd0007478c8a6698e753a34, type: 2}
+    priority: 0
+  - aniName: bite
+    aniClip: {fileID: 7400000, guid: 8bab697ce7149764c886b4f88bb88c4d, type: 2}
+    priority: 0
+  - aniName: jump
+    aniClip: {fileID: 7400000, guid: e3fbda7f436c8694a8730a69fa0aa585, type: 2}
     priority: 0
   currentAniName: null
 --- !u!95 &4567539666167829328
@@ -276,7 +283,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncDirection: 1
   syncMode: 0
-  syncInterval: 2
+  syncInterval: 0
   target: {fileID: 3824087511680214892}
   syncPosition: 1
   syncRotation: 1

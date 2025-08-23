@@ -123,14 +123,14 @@ public class ChainManager : NetworkBehaviour
         // 如果B距离A太远，限制B的位置
         if (distance > maxDistanceFromA)
         {
-            // 计算从A到B的方向
-            Vector2 direction = (bPlayer.transform.position - aPlayer.transform.position).normalized;
-
-            // 计算B的新位置，确保B不会超过最大距离
-            Vector2 newPosition = (Vector2)aPlayer.transform.position + direction * maxDistanceFromA;
-
-            // 移动B到新的位置
-            bPlayer.transform.position = newPosition;
+            //// 计算从A到B的方向
+            //Vector2 direction = (bPlayer.transform.position - aPlayer.transform.position).normalized;
+            //
+            //// 计算B的新位置，确保B不会超过最大距离
+            //Vector2 newPosition = (Vector2)aPlayer.transform.position + direction * maxDistanceFromA;
+            //
+            //// 移动B到新的位置
+            //bPlayer.transform.position = newPosition;
         }
 
         // 更新链条环的位置，确保环跟随A和B的移动（这一部分保持不变）

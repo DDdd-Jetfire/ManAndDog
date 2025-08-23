@@ -41,9 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Player
-    uniqueID: 846322965
+  - name: UnShowEnemy
+    uniqueID: 2724078665
     locked: 0
   - name: Terrain
     uniqueID: 4262377173
+    locked: 0
+  - name: ShowEnemy
+    uniqueID: 1490104141
+    locked: 0
+  - name: Player
+    uniqueID: 846322965
     locked: 0

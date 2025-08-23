@@ -9,7 +9,7 @@ public class HumanController : PlayerController
     private bool jumpRequest;
 
 
-
+    public EnemyVisibilityController evc;
 
 
     private void Start()
@@ -47,6 +47,12 @@ public class HumanController : PlayerController
         MoveController();
 
 
+        // A 玩家按键决定是否显示敌人
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+
+        }
+
         // 跳跃输入
         if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
@@ -58,7 +64,7 @@ public class HumanController : PlayerController
         {
             bool wantActive = !NetGameManager.Instance.IsLeashActive(); // 你可以缓存/查询当前状态
 
-            CmdSetLeashActive(wantActive    );  // 只允许 A 角色调用
+            CmdSetLeashActive(wantActive);  // 只允许 A 角色调用
         }
 
         // preface预估朝向
@@ -94,6 +100,10 @@ public class HumanController : PlayerController
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            if (evc != null)
+            {
+                evc.KillEnemy(gameObject.transform.position);
+            }
             Debug.Log("fire");
             ani.PlayOneShoot("fire");
         }
