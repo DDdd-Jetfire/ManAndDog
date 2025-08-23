@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class DogController : PlayerController
 {
+
+    public EnemyVisibilityController enemyInControl;
+
+
     private bool jumpRequest;
 
     //void Awake()
@@ -17,6 +21,8 @@ public class DogController : PlayerController
     {
         base.OnStartLocalPlayer();
         LocalGameManager.instance.InitSystem(false);
+        if (isLocalPlayer)
+            NetGameManager.Instance.CmdRegisterB(GetComponent<NetworkIdentity>());
         CmdRegisterAsB();
     }
 
@@ -47,12 +53,31 @@ public class DogController : PlayerController
         }
 
 
+        // 当 B 玩家按下 E 键时，开始控制敌人
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (enemyInControl != null)
+            {
+                enemyInControl.CmdStartControlByB();  // B 开始控制
+            }
+        }
+
+        // 当 B 玩家松开 E 键时，停止控制敌人
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            if (enemyInControl != null)
+            {
+                enemyInControl.CmdStopControlByB();  // B 停止控制
+            }
+        }
+
+
         // preface预估朝向
         if (move != 0)
         {
             //if (!isLockAttacking)
             //{
-               preface = move > 0 ? 1 : -1;
+            preface = move > 0 ? 1 : -1;
             //    //Debug.Log("unlock");
             //}
             //else
@@ -60,12 +85,24 @@ public class DogController : PlayerController
             //    //Debug.Log("lock");
             //}
             gameObject.transform.localEulerAngles = new Vector3(0, preface < 0 ? 180 : 0, 0);//更改朝向
-            ani.TransAction("walk");
+        }
+
+        if (isGrounded)
+        {
+            if (move != 0)
+            {
+                ani.TransAction("walk");
+            }
+            else
+            {
+                ani.TransAction("idle");
+            }
         }
         else
         {
-            ani.TransAction("idle");
+            ani.TransAction("jump");
         }
+
     }
 
     void FixedUpdate()
@@ -74,9 +111,11 @@ public class DogController : PlayerController
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
-
-        // 水平移动
-        rb.velocity = new Vector2(move * moveSpeed, rb.velocity.y);
+        else
+        {
+            // 水平移动
+            rb.velocity = new Vector2(move * moveSpeed, rb.velocity.y);
+        }
 
         // 跳跃
         if (jumpRequest)

@@ -21,7 +21,10 @@ public class HumanController : PlayerController
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
+        isPlayerA = true;
         LocalGameManager.instance.InitSystem(true);
+        if (isLocalPlayer)
+            NetGameManager.Instance.CmdRegisterA(GetComponent<NetworkIdentity>());
         CmdRegisterAsA();
     }
 
@@ -35,6 +38,7 @@ public class HumanController : PlayerController
 
     void Update()
     {
+        if (!isLocalPlayer) return;
 
         MoveChecker();
         GroundChecker();
@@ -47,6 +51,13 @@ public class HumanController : PlayerController
         if (Input.GetKeyDown(KeyCode.W) && isGrounded)
         {
             jumpRequest = true;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.E))  // 例：E 键切换
+        {
+            bool wantActive = !NetGameManager.Instance.IsLeashActive(); // 你可以缓存/查询当前状态
+            NetGameManager.Instance.CmdSetLeashActive(wantActive);
         }
 
         // preface预估朝向
@@ -62,11 +73,28 @@ public class HumanController : PlayerController
             //    //Debug.Log("lock");
             //}
             gameObject.transform.localEulerAngles = new Vector3(0, preface < 0 ? 180 : 0, 0);//更改朝向
-            ani.TransAction("walk");
+        }
+
+        if (isGrounded)
+        {
+            if (move != 0)
+            {
+                ani.TransAction("walk");
+            }
+            else
+            {
+                ani.TransAction("idle");
+            }
         }
         else
         {
-            ani.TransAction("idle");
+            ani.TransAction("jump");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("fire");
+            ani.PlayOneShoot("fire");
         }
     }
 
@@ -76,8 +104,11 @@ public class HumanController : PlayerController
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
         }
-        // 水平移动
-        rb.velocity = new Vector2(move * moveSpeed, rb.velocity.y);
+        else
+        {
+            // 水平移动
+            rb.velocity = new Vector2(move * moveSpeed, rb.velocity.y);
+        }
 
         // 跳跃
         if (jumpRequest)

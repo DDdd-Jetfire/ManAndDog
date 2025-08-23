@@ -10,6 +10,8 @@ public class PlayerController : NetworkBehaviour
     public float moveSpeed = 5f;       // 移动速度
     public float jumpForce = 10f;      // 跳跃力度
 
+    public bool isPlayerA = false;
+
     [Header("检测")]
 
     public int preface = 0;
@@ -131,6 +133,43 @@ public class PlayerController : NetworkBehaviour
         isTouchingWall = hitTop.collider != null || hitBottom.collider != null; 
         //is1LevelBlockedOnWall = hitTop.collider == null && hitMiddle.collider == null && hitBottom.collider != null;
         //is2LevelBlockedOnWall = hitTop.collider == null && hitMiddle.collider != null && hitBottom.collider != null;
+
+    }
+
+    private void OnDrawGizmos()
+    {
+        {
+
+            if (groundChecker == null) return;
+
+            Vector2 origin = groundChecker.transform.position;
+
+            Vector2 left = origin + Vector2.left * groundCheckWidth * 0.5f;
+            Vector2 right = origin + Vector2.right * groundCheckWidth * 0.5f;
+            Vector2 center = origin;
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(left, left + Vector2.up * groundCheckDistance);
+            Gizmos.DrawLine(center, center + Vector2.up * groundCheckDistance);
+            Gizmos.DrawLine(right, right + Vector2.up * groundCheckDistance);
+        }
+
+
+        if (wallChecker == null) return;
+
+        Vector2 center2 = wallChecker.transform.position;
+
+        Vector2 top = center2 + Vector2.up * verticalOffset;
+        Vector2 middle = center2 + Vector2.down * verticalOffset * 1 / 3;
+        Vector2 bottom = center2 + Vector2.down * verticalOffset;
+
+        Vector2 dir = preface > 0 ? Vector2.left : Vector2.right;
+
+        Gizmos.color = Color.cyan;
+
+        Gizmos.DrawLine(top, top + dir * wallCheckDistance);
+        Gizmos.DrawLine(middle, middle + dir * wallCheckDistance);
+        Gizmos.DrawLine(bottom, bottom + dir * wallCheckDistance);
 
     }
 

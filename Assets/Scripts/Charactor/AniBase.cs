@@ -42,7 +42,10 @@ public class AniBase : MonoBehaviour
         {
             animatorInfo = ani.GetCurrentAnimatorStateInfo(0);
             //Debug.Log(animatorInfo.normalizedTime);
-            if (animatorInfo.normalizedTime >= 0.96f) OnStateEnd();
+            if (animatorInfo.normalizedTime >= 0.96f)
+            {
+                OnStateEnd();
+            }
             //if (animatorInfo.normalizedTime % 1 >= 0.96f) OnStateEnd();
         }
     }
@@ -105,6 +108,7 @@ public class AniBase : MonoBehaviour
         //Debug.Log("playOneTime");
         if (aniNameIndex.ContainsKey(actionName))
         {
+            Debug.Log("playOneTime");
             ani.Play(aniNameIndex[actionName]);
             currentAniName = actionName;
         }
@@ -125,6 +129,8 @@ public class AniBase : MonoBehaviour
     protected void OnStateEnd()
     {
         //Debug.Log("end");
+                Debug.Log("break");
+
         inPlayOneShoot = false;
     }
 }

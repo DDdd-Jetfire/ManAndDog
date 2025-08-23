@@ -109,8 +109,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  moveSpeed: 5
-  jumpForce: 10
+  moveSpeed: 8
+  jumpForce: 13.5
+  isPlayerA: 0
   preface: 0
   isGrounded: 0
   isTouchingWall: 0
@@ -120,10 +121,11 @@ MonoBehaviour:
     m_Bits: 64
   groundCheckDistance: 0.5
   groundChecker: {fileID: 5603839835653050122}
-  groundCheckWidth: 0.6
+  groundCheckWidth: 0.9
   wallChecker: {fileID: 7823441452447862987}
   wallCheckDistance: 0.3
-  verticalOffset: 0.8
+  verticalOffset: 0.5
+  enemyInControl: {fileID: 0}
 --- !u!114 &2762222790919124065
 MonoBehaviour:
   m_ObjectHideFlags: 0

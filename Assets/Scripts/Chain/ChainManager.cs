@@ -81,6 +81,15 @@ public class ChainManager : NetworkBehaviour
         rings.Clear();
     }
 
+    // 额外添加 ClearChain() 方法
+    // 用于在松链或其他需要清理链条的场景中调用
+    [Server]
+    public void ClearChain()
+    {
+        // 销毁所有已生成的环
+        ClearRingsServer();
+    }
+
     [Server]
     private void RepositionRingsServer(Vector2 start, Vector2 end)
     {
@@ -97,7 +106,7 @@ public class ChainManager : NetworkBehaviour
         // 有 NetworkTransform，位置会自动同步给所有客户端
     }
 
-    // —— 服务器每帧驱动位置跟随（也可用定时器/阈值减少频率） ——
+    // —— 服务器每帧驱动位置跟随（也可用定时器/阈值减少频率） —— 
     private void Update()
     {
         if (!isServer) return;

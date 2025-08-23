@@ -141,7 +141,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   moveSpeed: 5
-  jumpForce: 10
+  jumpForce: 13.5
+  isPlayerA: 0
   preface: 0
   isGrounded: 0
   isTouchingWall: 0
@@ -154,7 +155,7 @@ MonoBehaviour:
   groundCheckWidth: 0.6
   wallChecker: {fileID: 2394635428507631169}
   wallCheckDistance: 0.3
-  verticalOffset: 0.8
+  verticalOffset: 1
 --- !u!114 &6548124595337716034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,6 +176,12 @@ MonoBehaviour:
     priority: 0
   - aniName: walk
     aniClip: {fileID: 7400000, guid: 121231faeb690264abb4f4c67694bc29, type: 2}
+    priority: 0
+  - aniName: jump
+    aniClip: {fileID: 7400000, guid: 602f9e7fef0a4d844b7375eea1544a56, type: 2}
+    priority: 0
+  - aniName: fire
+    aniClip: {fileID: 7400000, guid: 52703f9fede46944cb8eaf07514b7e77, type: 2}
     priority: 0
   currentAniName: null
 --- !u!95 &7102693184170394315
