@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 [System.Serializable]
 public struct LEAaniInfo
@@ -9,7 +10,7 @@ public struct LEAaniInfo
     public int priority;
 }
 
-public class AniBase : MonoBehaviour
+public class AniBase : NetworkBehaviour
 {
     [SerializeField]
     protected Animator ani;
@@ -95,14 +96,14 @@ public class AniBase : MonoBehaviour
     {
         if (inPlayOneShoot)
         {
-            if (aniPriority.ContainsKey(actionName))
-            {
-                if (aniPriority[actionName] > aniPriority[currentAniName])
-                {
-                    ani.Play(aniNameIndex[actionName]);
-                    currentAniName = actionName;
-                }
-            }
+            //if (aniPriority.ContainsKey(actionName))
+            //{
+            //    if (aniPriority[actionName] > aniPriority[currentAniName])
+            //    {
+            //        ani.Play(aniNameIndex[actionName]);
+            //        currentAniName = actionName;
+            //    }
+            //}
             return;
         }
         //Debug.Log("playOneTime");

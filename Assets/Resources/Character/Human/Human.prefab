@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 2394635428507631169}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.39, y: 0, z: 0}
+  m_LocalPosition: {x: 0.36, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -112,7 +112,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 846322965
-  m_SortingLayer: 1
+  m_SortingLayer: 4
   m_SortingOrder: 10
   m_Sprite: {fileID: -1648934749, guid: 2e860dd1b992bdd4b996a4d4ab1565ff, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -155,7 +155,10 @@ MonoBehaviour:
   groundCheckWidth: 0.6
   wallChecker: {fileID: 2394635428507631169}
   wallCheckDistance: 0.3
-  verticalOffset: 1
+  verticalOffset: 0.1
+  canWalk: 1
+  trainHit: 0
+  evc: {fileID: 0}
 --- !u!114 &6548124595337716034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,6 +171,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2365b917cb575c43abba8210ad8143d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   ani: {fileID: 7102693184170394315}
   inPlayOneShoot: 0
   aniInfos:
@@ -182,6 +188,12 @@ MonoBehaviour:
     priority: 0
   - aniName: fire
     aniClip: {fileID: 7400000, guid: 52703f9fede46944cb8eaf07514b7e77, type: 2}
+    priority: 0
+  - aniName: meat
+    aniClip: {fileID: 7400000, guid: 9385daa688cf9b24a805f4eb35a2657e, type: 2}
+    priority: 0
+  - aniName: smoke
+    aniClip: {fileID: 7400000, guid: 02363743d29226141badec8b5b85ba01, type: 2}
     priority: 0
   currentAniName: null
 --- !u!95 &7102693184170394315
@@ -254,7 +266,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.3}
+  m_Offset: {x: 0, y: -0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -265,7 +277,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.6, y: 1.4}
+  m_Size: {x: 0.6, y: 0.9}
   m_EdgeRadius: 0
 --- !u!50 &-5682178524775571492
 Rigidbody2D:
@@ -370,7 +382,7 @@ Transform:
   m_GameObject: {fileID: 8823803601967955147}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1.08, z: 0}
+  m_LocalPosition: {x: 0, y: -1.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

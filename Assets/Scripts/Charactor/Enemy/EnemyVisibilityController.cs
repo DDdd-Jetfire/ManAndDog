@@ -10,9 +10,18 @@ public class EnemyVisibilityController : NetworkBehaviour
     public AniBase ani;
 
     [SyncVar]public bool bitFlag = false;
+    [SyncVar] public bool showFlag = false;
 
     public HumanController hc;
     [SyncVar] public Vector2? hitPos;
+
+    public float maxAlertTime = 2f;
+    public float currentAlertTime = 0f;
+    public bool isAlert = false;
+
+    public float sceneIndex = 0;
+
+    //public bool canAlert
 
     void Awake()
     {
@@ -20,8 +29,11 @@ public class EnemyVisibilityController : NetworkBehaviour
         if (renderersToToggle == null || renderersToToggle.Length == 0)
             renderersToToggle = GetComponentsInChildren<Renderer>(true);
         ani = gameObject.GetComponent<AniBase>();
-       // if (collidersToToggle == null || collidersToToggle.Length == 0)
-       //     collidersToToggle = GetComponentsInChildren<Collider2D>(true);
+        // if (collidersToToggle == null || collidersToToggle.Length == 0)
+        //     collidersToToggle = GetComponentsInChildren<Collider2D>(true);
+        currentAlertTime = maxAlertTime;
+        //  sceneIndex = CameraManager.instance.currentSpawnIndex;
+        ani.TransAction("idle");
     }
 
     private void OnEnable()
@@ -42,26 +54,6 @@ public class EnemyVisibilityController : NetworkBehaviour
         // 等待玩家 ready（可能敌人先于玩家 spawn）
         //StartCoroutine(InitVisibilityForAB());
     }
-    IEnumerator InitVisibilityForAB()
-    {
-        float t = 0f;
-        NetworkConnectionToClient connA = null, connB = null;
-
-        while (t < 2f && (connA == null || connB == null))
-        {
-            (connA, connB) = FindABConnections();
-            //t += Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        // 输出调试信息，确认 connA 和 connB 是否正确
-        Debug.Log($"connA: {connA}, connB: {connB}");
-
-        // 初始策略：对 A 继续隐藏、对 B 显示
-        if (connA != null) TargetSetVisible(connA, false);
-        if (connB != null) TargetSetVisible(connB, true);
-    }
-
 
     public void GetBit()
     {
@@ -79,13 +71,16 @@ public class EnemyVisibilityController : NetworkBehaviour
     }
 
 
-    // ClientRpc: 服务器调用，所有客户端执行
-    [ClientRpc]
-    void RpcUpdatebit(bool flag)
+    // Command: 客户端调用，服务器执行
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateShow(bool flag)
     {
-        // 客户端更新
-        bitFlag = flag;
+        showFlag = flag;
+
+        // 使用 Rpc 将值同步到所有客户端
+        //RpcUpdatebit(flag);
     }
+
 
     public void StopBit()
     {
@@ -94,6 +89,27 @@ public class EnemyVisibilityController : NetworkBehaviour
 
     void Update()
     {
+        //Debug.Log($"{gameObject.name} : this {sceneIndex} and {CameraManager.instance.currentSpawnIndex}");
+        if (sceneIndex != CameraManager.instance.currentSpawnIndex) return;
+        if (ChainManager.instance.isShooting != null && !bitFlag && hitPos == null)
+        {
+            if (!isAlert)
+            {
+
+                //gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                AudioManager.instance.CmdPlaySound(3, transform.position);
+                isAlert = true;
+            }
+            currentAlertTime -= Time.deltaTime;
+            gameObject.transform.eulerAngles = new Vector3(0, (ChainManager.instance.aPlayer.transform.position.x
+                                                                - gameObject.transform.position.x) > 0 ? 0 : 180, 0);
+            
+            if (currentAlertTime < 0)
+            {
+                ChainManager.instance.ResetCurrentScene();
+            }
+        }
+
         if (hitPos != null)
         {
             ani.PlayOneShoot("die");
@@ -104,7 +120,7 @@ public class EnemyVisibilityController : NetworkBehaviour
         }
         else
         {
-            if (bitFlag)
+            if (showFlag)
             {
                 gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "ShowEnemy";
             }
@@ -114,16 +130,33 @@ public class EnemyVisibilityController : NetworkBehaviour
                 gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "UnShowEnemy";
             }
 
-            if (bitFlag)hc.evc = this;
+            if (bitFlag)
+            {
+                if (showFlag)
+                {
+                    hc.evc = this;
+                }
+                else
+                {
+                    hc.evc = null;
+                }
+            }
         }
-
+        
         if (bitFlag)
         {
             ani.TransAction("bit");
         }
         else
         {
-            ani.TransAction("idle");
+            if (ChainManager.instance.isShooting != null)
+            {
+                ani.TransAction("alert");
+            }
+            else
+            {
+                ani.TransAction("idle");
+            }
         }
     }
 
@@ -135,6 +168,17 @@ public class EnemyVisibilityController : NetworkBehaviour
         hitPos = dir;
     }
 
+    [ClientRpc]
+    public void RpcResetObj()
+    {
+        bitFlag = false;
+        hitPos = null;
+        showFlag = false;
+        isAlert = false;
+        currentAlertTime = maxAlertTime;
+        gameObject.transform.eulerAngles = new Vector3(0, 0, 0);
+        gameObject.SetActive(true);
+    }
 
     public void Die()
     {

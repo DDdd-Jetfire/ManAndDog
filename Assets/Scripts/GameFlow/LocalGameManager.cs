@@ -15,6 +15,8 @@ public class LocalGameManager : MonoBehaviour
     public GameObject bTileMap;
     public GameObject blackBoard;
 
+    public GameObject title;
+
     private void Awake()
     {
         if (instance == null)
@@ -36,6 +38,7 @@ public class LocalGameManager : MonoBehaviour
     public void InitSystem(bool isA)
     {
         isAPlayer = isA;
+        title.SetActive(false);
         if (isAPlayer)
         {
             //bTileMap.SetActive(false);

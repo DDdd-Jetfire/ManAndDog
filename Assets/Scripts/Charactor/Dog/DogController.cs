@@ -16,10 +16,12 @@ public class DogController : PlayerController
     public LayerMask sightLayer;        // 敌人所在的Layer
 
     public bool biteFlag = false;
-                                        //void Awake()
-                                        //{
+    [SyncVar] public bool showSelf = false;
 
-    //}
+    public float maxShowTime = 3f;
+    public float currentShowTime = 0;
+    //void Awake()
+    //{
 
     // 这里是用来在本地玩家对象初始化完成时调用
     public override void OnStartLocalPlayer()
@@ -27,8 +29,8 @@ public class DogController : PlayerController
         base.OnStartLocalPlayer();
         enemyManager = EnemyManager.Instance;
         LocalGameManager.instance.InitSystem(false);
-        if (isLocalPlayer)
-            NetGameManager.Instance.CmdRegisterB(GetComponent<NetworkIdentity>());
+        //if (isLocalPlayer)
+        //    NetGameManager.Instance.CmdRegisterB(GetComponent<NetworkIdentity>());
         CmdRegisterAsB();
     }
 
@@ -41,7 +43,29 @@ public class DogController : PlayerController
     }
     void Update()
     {
+
+
+        if (showSelf)
+        {
+            //gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Player";
+        }
+        else
+        {
+            //gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "UnShowEnemy";
+        }
+
         if (!isLocalPlayer) return;
+
+        if (ChainManager.instance.isChain || ChainManager.instance.isNear || currentShowTime > 0)
+        {
+            CmdUpdateShow(true);
+        }
+        else
+        {
+            CmdUpdateShow(false);
+        }
 
         MoveChecker();
 
@@ -67,12 +91,31 @@ public class DogController : PlayerController
 
         if (Input.GetKey(KeyCode.E) && enemyInControl != null)
         {
-            
+
             {
-                gameObject.transform.position = enemyInControl.gameObject.transform.position;
-                Debug.Log("mark");
                 biteFlag = true;
+            }
+        }
+        else
+        {
+            //biteFlag = false;
+        }
+        if(enemyInControl != null)
+        {
+
+            if (biteFlag)
+            {
+
+                gameObject.transform.position = enemyInControl.gameObject.transform.position;
                 enemyInControl.CmdUpdateBit(true);
+                if (showSelf)
+                {
+                    enemyInControl.CmdUpdateShow(true);
+                }
+                else
+                {
+                    enemyInControl.CmdUpdateShow(false);
+                }
             }
         }
         else
@@ -80,15 +123,20 @@ public class DogController : PlayerController
             biteFlag = false;
         }
 
+        if (enemyInControl == null || enemyInControl.hitPos != null)
+        {
+            biteFlag = false;
+        }
+
 
         // 当 B 玩家松开 E 键时，停止控制敌人
-        if (Input.GetKeyUp(KeyCode.E))
-        {
-            if (enemyInControl != null)
-            {
-                enemyInControl.StopBit();
-            }
-        }
+        //if (Input.GetKeyUp(KeyCode.E))
+        //{
+        //    if (enemyInControl != null)
+        //    {
+        //        enemyInControl.StopBit();
+        //    }
+        //}
 
 
         // preface预估朝向
@@ -130,6 +178,19 @@ public class DogController : PlayerController
             }
 
         }
+
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            int tempInt = Random.Range(0, 2);
+            currentShowTime = maxShowTime;
+            //ani.PlayOneShoot("fire");
+            AudioManager.instance.CmdPlaySound(tempInt, transform.position);
+        }
+        if (currentShowTime > 0)
+        {
+            currentShowTime -= Time.deltaTime;
+        }
     }
 
     void FixedUpdate()
@@ -156,39 +217,29 @@ public class DogController : PlayerController
         }
     }
 
-
-
-
-
-    // RPC 方法：更新敌人显示给 A 端
-    [ClientRpc]
-    void RpcUpdateEnemyVisibility(bool visible)
-    {
-        if (isServer) return;  // 只有客户端执行
-
-        // 通过管理器设置 A 端显示该敌人
-        if (enemyManager != null)
-        {
-            GameObject enemy = enemyManager.GetMarkedEnemy();
-            if (enemy != null)
-            {
-                enemyManager.SetEnemyVisibility(connectionToClient, visible);
-            }
-        }
-    }
-
     // 检测范围内的敌人
     EnemyVisibilityController DetectEnemiesInRange()
     {
         // 使用OverlapCircle方法检测范围内的敌人
         Collider2D[] c = Physics2D.OverlapCircleAll(transform.position, detectionRadius, sightLayer);
-        foreach(var c1 in c)
+        foreach (var c1 in c)
         {
             var x = c1.GetComponent<EnemyVisibilityController>();
             if (x != null) return x;
         }
         return null;
     }
+
+    // Command: 客户端调用，服务器执行
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateShow(bool flag)
+    {
+        showSelf = flag;
+
+        // 使用 Rpc 将值同步到所有客户端
+        //RpcUpdatebit(flag);
+    }
+
 
     // 画出检测的范围（调试用）
     void OnDrawGizmos()

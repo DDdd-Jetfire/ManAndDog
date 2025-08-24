@@ -33,7 +33,7 @@ Transform:
   m_GameObject: {fileID: 526446893022129988}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.1, y: -1.95, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -78,7 +78,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1570888631
-  m_SortingLayer: 2
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: -803226436, guid: 032481b8d10efff4b9fa4d90c186589d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -110,7 +110,12 @@ MonoBehaviour:
   - {fileID: 1543071389997318566}
   ani: {fileID: 0}
   bitFlag: 0
+  showFlag: 0
   hc: {fileID: 0}
+  maxAlertTime: 2
+  currentAlertTime: 0
+  isAlert: 0
+  sceneIndex: 0
 --- !u!114 &373791741693008995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,13 +132,16 @@ MonoBehaviour:
   inPlayOneShoot: 0
   aniInfos:
   - aniName: bit
-    aniClip: {fileID: 7400000, guid: 8222b77d69bff664eb60fd81a65233e4, type: 2}
+    aniClip: {fileID: 7400000, guid: a44cf5085a9a41a4ea8823955a7b4063, type: 2}
     priority: 0
   - aniName: die
-    aniClip: {fileID: 7400000, guid: e96b2bc2260825b42b030f2ea96036c9, type: 2}
+    aniClip: {fileID: 7400000, guid: d86c18778e581c740a0fe1ad672a8521, type: 2}
     priority: 0
   - aniName: idle
-    aniClip: {fileID: 7400000, guid: b0551ea6dd87e00469c49cf1d8f44f73, type: 2}
+    aniClip: {fileID: 7400000, guid: 4d7c1fd1e9ed25346a4a764d665fe133, type: 2}
+    priority: 0
+  - aniName: alert
+    aniClip: {fileID: 7400000, guid: be8628fc2f98ab34cafb62acaf469578, type: 2}
     priority: 0
   currentAniName: null
 --- !u!95 &2020304843887785051
@@ -146,7 +154,7 @@ Animator:
   m_GameObject: {fileID: 526446893022129988}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d6af4fdd926f20c49943ec3957620975, type: 2}
+  m_Controller: {fileID: 9100000, guid: b928279dec118b944a3bfce4bfae3757, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

@@ -7,10 +7,19 @@ public class HumanController : PlayerController
 {
 
     private bool jumpRequest;
+    public bool canWalk = true;
+
+    [SyncVar]public bool trainHit = false;
+
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpdateTrainHit(bool flag)
+    {
+        trainHit = flag;
+    }
 
 
     public EnemyVisibilityController evc;
-
 
     private void Start()
     {
@@ -23,8 +32,8 @@ public class HumanController : PlayerController
         base.OnStartLocalPlayer();
         isPlayerA = true;
         LocalGameManager.instance.InitSystem(true);
-        if (isLocalPlayer)
-            NetGameManager.Instance.CmdRegisterA(GetComponent<NetworkIdentity>());
+        //if (isLocalPlayer)
+            //NetGameManager.Instance.CmdRegisterA(GetComponent<NetworkIdentity>());
         CmdRegisterAsA();
     }
 
@@ -40,6 +49,22 @@ public class HumanController : PlayerController
     {
         if (!isLocalPlayer) return;
 
+        if (ChainManager.instance.isSmokeing)
+        {
+            ani.TransAction("smoke");
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            ChainManager.instance.ResetCurrentScene();
+        }
+        if (trainHit)
+        {
+
+            ani.TransAction("meat");
+            return;
+        }
         MoveChecker();
         GroundChecker();
         WallChecker();
@@ -47,11 +72,7 @@ public class HumanController : PlayerController
         MoveController();
 
 
-        // A 玩家按键决定是否显示敌人
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-
-        }
+        
 
         // 跳跃输入
         if (Input.GetKeyDown(KeyCode.W) && isGrounded)
@@ -62,9 +83,13 @@ public class HumanController : PlayerController
 
         if (Input.GetKeyDown(KeyCode.E))  // 例：E 键切换
         {
-            bool wantActive = !NetGameManager.Instance.IsLeashActive(); // 你可以缓存/查询当前状态
+            if (!ChainManager.instance.isChain && ChainManager.instance.isNear)
+            {
+                ResetChain();
+            }
+            //bool wantActive = !NetGameManager.Instance.IsLeashActive(); // 你可以缓存/查询当前状态
 
-            CmdSetLeashActive(wantActive);  // 只允许 A 角色调用
+            //CmdSetLeashActive(wantActive);  // 只允许 A 角色调用
         }
 
         // preface预估朝向
@@ -98,15 +123,33 @@ public class HumanController : PlayerController
             ani.TransAction("jump");
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !ani.inPlayOneShoot)
         {
             if (evc != null)
             {
                 evc.KillEnemy(gameObject.transform.position);
             }
-            Debug.Log("fire");
             ani.PlayOneShoot("fire");
+            AudioManager.instance.CmdPlaySound(2, transform.position);
         }
+
+    }
+
+    public void ShootFrame()
+    {
+        ChainManager.instance.CmdUpdateShoot(transform.position);
+    }
+
+    public void TrianHit()
+    {
+    }
+
+    [Command]
+    private void ResetChain()
+    {
+
+        //gameObject.GetComponent<SpriteRenderer>().color = Color.blue;
+        ChainManager.instance.SetA(gameObject);
     }
 
 
@@ -121,11 +164,16 @@ public class HumanController : PlayerController
         //    return;  // 只有 A 角色才能调用
         //}
 
-        NetGameManager.Instance.SetLeashActive(active);  // 更新拴链状态
+        //NetGameManager.Instance.SetLeashActive(active);  // 更新拴链状态
     }
 
     void FixedUpdate()
     {
+        if (trainHit || ChainManager.instance.isSmokeing)
+        {
+            rb.velocity = new Vector2(0, rb.velocity.y);
+            return;
+        }
         if (isTouchingWall)
         {
             rb.velocity = new Vector2(0, rb.velocity.y);
@@ -143,8 +191,5 @@ public class HumanController : PlayerController
             jumpRequest = false;
         }
     }
-
-
-
 
 }

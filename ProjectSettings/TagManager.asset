@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Human
+  - Dog
   layers:
   - Default
   - TransparentFX
@@ -52,4 +54,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 846322965
+    locked: 0
+  - name: TopObj
+    uniqueID: 3803522971
     locked: 0

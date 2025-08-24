@@ -81,7 +81,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 846322965
-  m_SortingLayer: 1
+  m_SortingLayer: 4
   m_SortingOrder: 20
   m_Sprite: {fileID: 1989757124, guid: 3eab724e5ee9ec9459f75c23d2c7a9b9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -127,10 +127,14 @@ MonoBehaviour:
   verticalOffset: 0.5
   enemyInControl: {fileID: 0}
   enemyManager: {fileID: 0}
-  detectionRadius: 5
+  detectionRadius: 1
   sightLayer:
     serializedVersion: 2
     m_Bits: 256
+  biteFlag: 0
+  showSelf: 0
+  maxShowTime: 3
+  currentShowTime: 0
 --- !u!114 &2762222790919124065
 MonoBehaviour:
   m_ObjectHideFlags: 0
